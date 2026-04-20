@@ -1,15 +1,36 @@
 export default function Login() {
-  async function handleLogin() {
-    await fetch('/api/createUser', {
-      method: 'POST',
-    });
-    alert('Usuario creado 🚀');
-  }
-
   return (
-    <div>
-      <h1>Login</h1>
-      <button onClick={handleLogin}>Crear usuario</button>
+    <div style={{
+      height: "100vh",
+      background: "black",
+      color: "white",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      flexDirection: "column"
+    }}>
+      <h1>Login 🏴‍☠️</h1>
+
+      <input
+        placeholder="Usuario"
+        style={{ margin: 10, padding: 10 }}
+      />
+
+      <input
+        placeholder="Contraseña"
+        type="password"
+        style={{ margin: 10, padding: 10 }}
+      />
+
+      <button style={{
+        marginTop: 10,
+        padding: 10,
+        background: "gold",
+        border: "none",
+        cursor: "pointer"
+      }}>
+        Entrar
+      </button>
     </div>
   );
 }
