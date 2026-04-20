@@ -1,3 +1,3 @@
 export default function Home() {
-  return <h1>Funciona 🔥</h1>;
+  return <h1>Inicio 🏴‍☠️</h1>;
 }
