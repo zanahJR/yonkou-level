@@ -8,7 +8,7 @@ export default function Ranking() {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>🏴‍☠️ Ranking Pirata</h1>
+      <h1 style={styles.title}>🏴‍☠️ Pirate Ranking</h1>
 
       {players.map((p, i) => (
         <div key={i} style={styles.card}>
@@ -34,11 +34,11 @@ const styles = {
   container: {
     minHeight: "100vh",
     padding: "40px",
-    backgroundImage: "url('/pirate-bg.jpg')",
+    backgroundImage:
+      "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')",
     backgroundSize: "cover",
     color: "white",
     fontFamily: "Arial",
-    animation: "fade 2s ease-in",
   },
 
   title: {
@@ -66,4 +66,3 @@ const styles = {
     background: "gold",
   },
 };
-
