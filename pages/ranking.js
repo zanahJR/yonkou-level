@@ -1,73 +1,69 @@
-import { useEffect, useState } from "react";
-
 export default function Ranking() {
-  const [players, setPlayers] = useState([]);
-
-  useEffect(() => {
-    fetch("/api/player")
-      .then(res => res.json())
-      .then(data => setPlayers([data]));
-  }, []);
+  const players = [
+    { name: "Barbanegra", points: 900 },
+    { name: "Corsario Rojo", points: 700 },
+    { name: "Capitán Sombra", points: 500 },
+    { name: "Lobo del Mar", points: 300 },
+  ];
 
   return (
-    <div style={{
-      backgroundImage: "url('/bg.jpg')",
-      backgroundSize: "cover",
-      minHeight: "100vh",
-      padding: "40px",
-      color: "white",
-      fontFamily: "sans-serif"
-    }}>
-      
-      <h1 style={{
-        fontSize: "50px",
-        textAlign: "center",
-        textShadow: "2px 2px 10px black"
-      }}>
-        🏴‍☠️ PIRATE RANKING
-      </h1>
+    <div style={styles.container}>
+      <h1 style={styles.title}>🏴‍☠️ Ranking Pirata</h1>
 
-      <div style={{
-        maxWidth: "600px",
-        margin: "40px auto",
-        background: "rgba(0,0,0,0.7)",
-        padding: "30px",
-        borderRadius: "15px",
-        boxShadow: "0 0 20px black"
-      }}>
-        
-        {players.length === 0 ? (
-          <p>Cargando...</p>
-        ) : (
-          players.map((p, i) => (
-            <div key={i} style={{
-              marginBottom: "20px",
-              padding: "20px",
-              background: "#1e293b",
-              borderRadius: "10px"
-            }}>
-              <h2>☠️ {p.name}</h2>
-              <p>💰 Puntos: {p.points}</p>
-              <p>⭐ Nivel: {p.level}</p>
+      {players.map((p, i) => (
+        <div key={i} style={styles.card}>
+          <span>{p.name}</span>
 
-              {/* Barra de nivel */}
-              <div style={{
-                background: "#333",
-                borderRadius: "10px",
-                overflow: "hidden",
-                marginTop: "10px"
-              }}>
-                <div style={{
-                  width: `${(p.points % 100)}%`,
-                  background: "gold",
-                  height: "10px"
-                }} />
-              </div>
+          <div style={styles.barContainer}>
+            <div
+              style={{
+                ...styles.bar,
+                width: `${p.points / 10}%`,
+              }}
+            />
+          </div>
 
-            </div>
-          ))
-        )}
-      </div>
+          <span>{p.points} pts</span>
+        </div>
+      ))}
     </div>
   );
 }
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    padding: "40px",
+    backgroundImage: "url('/pirate-bg.jpg')",
+    backgroundSize: "cover",
+    color: "white",
+    fontFamily: "Arial",
+    animation: "fade 2s ease-in",
+  },
+
+  title: {
+    fontSize: "40px",
+    textAlign: "center",
+    marginBottom: "30px",
+    textShadow: "0 0 10px black",
+  },
+
+  card: {
+    background: "rgba(0,0,0,0.7)",
+    padding: "15px",
+    marginBottom: "15px",
+    borderRadius: "10px",
+  },
+
+  barContainer: {
+    height: "10px",
+    background: "#222",
+    marginTop: "5px",
+  },
+
+  bar: {
+    height: "100%",
+    background: "gold",
+  },
+};
+
