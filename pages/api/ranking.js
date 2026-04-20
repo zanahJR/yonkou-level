@@ -1,10 +1,7 @@
-import { supabase } from '../../lib/supabase';
-
-export default async function handler(req, res) {
-  const { data } = await supabase
-    .from('players')
-    .select('*')
-    .order('points', { ascending: false });
-
-  res.status(200).json(data);
+export default function Ranking() {
+  return (
+    <div style={{ color: "white", background: "black", height: "100vh" }}>
+      <h1>🏴‍☠️ Ranking PIRATA</h1>
+    </div>
+  );
 }
