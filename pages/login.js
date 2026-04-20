@@ -1,3 +1,15 @@
 export default function Login() {
-  return <h1>Login funcionando</h1>;
+  async function handleLogin() {
+    await fetch('/api/createUser', {
+      method: 'POST',
+    });
+    alert('Usuario creado 🚀');
+  }
+
+  return (
+    <div>
+      <h1>Login</h1>
+      <button onClick={handleLogin}>Crear usuario</button>
+    </div>
+  );
 }
