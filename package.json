@@ -1,15 +1,74 @@
-{
-  "name": "yonkou-level",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
-  },
-  "dependencies": {
-    "next": "14.2.3",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
-  }
+export default function Ranking() {
+  const players = [
+    { name: "Barbanegra", points: 900 },
+    { name: "Shanks Oscuro", points: 750 },
+    { name: "Capitán Rojo", points: 600 },
+    { name: "Corsario", points: 400 }
+  ];
+
+  return (
+    <div className="container">
+      <h1 className="title">🏴‍☠️ RANKING PIRATA</h1>
+
+      {players.map((p, i) => (
+        <div key={i} className="card">
+          <span>{p.name}</span>
+          <div className="bar">
+            <div
+              className="fill"
+              style={{ width: `${p.points / 10}%` }}
+            ></div>
+          </div>
+          <span>{p.points} pts</span>
+        </div>
+      ))}
+
+      <style jsx>{`
+        .container {
+          min-height: 100vh;
+          padding: 40px;
+          color: white;
+          font-family: Arial;
+          background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
+          background-size: 400% 400%;
+          animation: bg 10s ease infinite;
+        }
+
+        @keyframes bg {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        .title {
+          text-align: center;
+          font-size: 40px;
+          margin-bottom: 40px;
+          text-shadow: 0 0 20px red;
+        }
+
+        .card {
+          background: rgba(0,0,0,0.6);
+          padding: 20px;
+          margin: 15px 0;
+          border-radius: 10px;
+          box-shadow: 0 0 15px black;
+        }
+
+        .bar {
+          height: 20px;
+          background: #222;
+          margin: 10px 0;
+          border-radius: 10px;
+          overflow: hidden;
+        }
+
+        .fill {
+          height: 100%;
+          background: linear-gradient(90deg, red, orange);
+          box-shadow: 0 0 10px red;
+        }
+      `}</style>
+    </div>
+  );
 }
