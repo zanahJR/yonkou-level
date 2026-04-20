@@ -1,6 +1,16 @@
-export default function handler(req, res) {
+import { supabase } from '../../lib/supabase';
+
+export default async function handler(req, res) {
+  const { data } = await supabase
+    .from('players')
+    .select('*')
+    .limit(1)
+    .single();
+
+  const level = Math.floor(data.points / 100);
+
   res.status(200).json({
-    name: 'Jugador',
-    level: 1,
+    ...data,
+    level
   });
 }
