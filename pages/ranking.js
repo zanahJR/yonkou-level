@@ -22,9 +22,10 @@ export default function Ranking() {
             <div style={{
               width: `${p.level}%`,
               height: "100%",
-              background: "linear-gradient(90deg, gold, orange)",
+              background: "linear-gradient(90deg, gold, orange, red)",
               borderRadius: 10,
-              boxShadow: "0 0 10px gold"
+              boxShadow: "0 0 15px gold",
+              transition: "width 1s ease"
             }} />
           </div>
 
