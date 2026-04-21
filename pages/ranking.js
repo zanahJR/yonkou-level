@@ -1,35 +1,41 @@
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
+
 export default function Ranking() {
-  const players = [
-    { name: "Capitán Rojo", level: 100 },
-    { name: "Barbanegra", level: 90 },
-    { name: "Lobo del Mar", level: 80 }
-  ];
+  const [players, setPlayers] = useState([]);
+
+  useEffect(() => {
+    fetchPlayers();
+  }, []);
+
+  const fetchPlayers = async () => {
+    const { data, error } = await supabase
+      .from("players")
+      .select("*")
+      .order("xp", { ascending: false });
+
+    if (error) {
+      console.log(error);
+    }
+
+    setPlayers(data || []);
+  };
 
   return (
-    <div style={{ padding: 40 }}>
-      <h1 className="glow">🏆 Ranking de Piratas</h1>
+    <div style={{
+      minHeight: "100vh",
+      background: "#000",
+      color: "white",
+      padding: 20
+    }}>
+      <h1>🏆 Ranking</h1>
 
       {players.map((p, i) => (
-        <div key={i} className="card">
-          <strong>{p.name}</strong>
-
-          <div style={{
-            background: "#222",
-            height: 20,
-            borderRadius: 10,
-            marginTop: 10
-          }}>
-            <div style={{
-              width: `${p.level}%`,
-              height: "100%",
-              background: "linear-gradient(90deg, gold, orange, red)",
-              borderRadius: 10,
-              boxShadow: "0 0 15px gold",
-              transition: "width 1s ease"
-            }} />
-          </div>
-
-          <div>Nivel: {p.level}</div>
+        <div key={i} style={{
+          padding: 10,
+          borderBottom: "1px solid #333"
+        }}>
+          {i + 1}. {p.name} — XP: {p.xp}
         </div>
       ))}
     </div>
