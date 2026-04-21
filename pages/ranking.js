@@ -1,35 +1,34 @@
 export default function Ranking() {
   const players = [
-    { name: "Luffy", level: 100 },
-    { name: "Zoro", level: 90 },
-    { name: "Sanji", level: 85 }
+    { name: "Capitán Rojo", level: 100 },
+    { name: "Barbanegra", level: 90 },
+    { name: "Lobo del Mar", level: 80 }
   ];
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#111",
-      color: "white",
-      padding: 40
-    }}>
-      <h1>🏆 Ranking</h1>
+    <div style={{ padding: 40 }}>
+      <h1 className="glow">🏆 Ranking de Piratas</h1>
 
       {players.map((p, i) => (
-        <div key={i} style={{ marginBottom: 20 }}>
-          <div>{p.name}</div>
+        <div key={i} className="card">
+          <strong>{p.name}</strong>
 
           <div style={{
-            background: "#333",
+            background: "#222",
             height: 20,
-            borderRadius: 10
+            borderRadius: 10,
+            marginTop: 10
           }}>
             <div style={{
               width: `${p.level}%`,
-              background: "gold",
               height: "100%",
-              borderRadius: 10
+              background: "linear-gradient(90deg, gold, orange)",
+              borderRadius: 10,
+              boxShadow: "0 0 10px gold"
             }} />
           </div>
+
+          <div>Nivel: {p.level}</div>
         </div>
       ))}
     </div>
