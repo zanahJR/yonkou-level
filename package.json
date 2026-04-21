@@ -2,18 +2,18 @@
   "name": "yonkou-level",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "next": "14.2.5",
+    "next": "latest",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "@supabase/supabase-js": "^2.0.0"
-  },
-  "engines": {
-    "node": "24.x"
   }
 }
