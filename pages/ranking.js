@@ -12,7 +12,7 @@ export default function Ranking() {
     const { data, error } = await supabase
       .from("players")
       .select("*")
-      .order("xp", { ascending: false });
+      .order("haki", { ascending: false });
 
     if (error) {
       console.log(error);
@@ -35,7 +35,7 @@ export default function Ranking() {
           padding: 10,
           borderBottom: "1px solid #333"
         }}>
-          {i + 1}. {p.name} — XP: {p.xp}
+          {i + 1}. {p.name} — HAKI: {p.xp}
         </div>
       ))}
     </div>
