@@ -5,17 +5,14 @@ export default function Login() {
   const [name, setName] = useState("");
 
   const handleLogin = async () => {
-    if (!name) {
-      alert("Escribe un nombre");
-      return;
-    }
+    if (!name) return alert("Escribe un nombre");
 
     const { error } = await supabase
       .from("players")
       .insert([{ name, haki: 0 }]);
 
     if (error) {
-      alert("Error: " + error.message);
+      alert(error.message);
       return;
     }
 
@@ -28,37 +25,19 @@ export default function Login() {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background: "radial-gradient(circle, #1a1a1a, #000)",
+      background: "black",
       color: "white"
     }}>
-      <div style={{
-        padding: 30,
-        borderRadius: 12,
-        border: "1px solid gold"
-      }}>
+      <div>
         <h2>Login 🏴‍☠️</h2>
 
         <input
-          placeholder="Tu nombre pirata"
+          placeholder="Nombre"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          style={{
-            padding: 10,
-            width: "100%",
-            marginBottom: 10
-          }}
         />
 
-        <button
-          onClick={handleLogin}
-          style={{
-            width: "100%",
-            padding: 10,
-            background: "gold",
-            border: "none",
-            cursor: "pointer"
-          }}
-        >
+        <button onClick={handleLogin}>
           Entrar
         </button>
       </div>
