@@ -13,20 +13,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Faltan datos" });
     }
 
-    // 🔄 resultado inverso
     const opponentResult = result === "win" ? "lose" : "win";
 
-    // 🔥 guardar para jugador
+    // 🔥 GUARDAR MATCH PARA AMBOS
     await supabase.from("matches").insert([
       {
         player_id: playerId,
         opponent_id: opponentId,
         result: result,
       },
-    ]);
-
-    // 🔥 guardar para rival
-    await supabase.from("matches").insert([
       {
         player_id: opponentId,
         opponent_id: playerId,
@@ -34,21 +29,13 @@ export default async function handler(req, res) {
       },
     ]);
 
-    // 🔍 obtener jugador
+    // 🔥 ACTUALIZAR JUGADOR
     const { data: player } = await supabase
       .from("players")
       .select("haki, wins, loses")
       .eq("id", playerId)
       .single();
 
-    // 🔍 obtener rival
-    const { data: opponent } = await supabase
-      .from("players")
-      .select("haki, wins, loses")
-      .eq("id", opponentId)
-      .single();
-
-    // 🧠 actualizar jugador
     await supabase
       .from("players")
       .update({
@@ -58,7 +45,13 @@ export default async function handler(req, res) {
       })
       .eq("id", playerId);
 
-    // 🧠 actualizar rival
+    // 🔥 ACTUALIZAR RIVAL
+    const { data: opponent } = await supabase
+      .from("players")
+      .select("haki, wins, loses")
+      .eq("id", opponentId)
+      .single();
+
     await supabase
       .from("players")
       .update({
