@@ -4,7 +4,6 @@ import { supabase } from "../lib/supabase";
 export default function Ranking() {
   const [players, setPlayers] = useState([]);
 
-  // 🔥 calcular nivel
   const getLevel = (haki) => Math.floor(haki / 10) + 1;
 
   const fetchPlayers = async () => {
@@ -20,10 +19,7 @@ export default function Ranking() {
 
   useEffect(() => {
     fetchPlayers();
-
-    // 🔄 auto refresh cada 3s
     const interval = setInterval(fetchPlayers, 3000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -34,13 +30,31 @@ export default function Ranking() {
       background: "radial-gradient(circle at top, #1a1a1a, #000)",
       color: "white"
     }}>
-      <h1 style={{
-        color: "gold",
-        textShadow: "0 0 20px gold"
-      }}>
-        🏆 Ranking
-      </h1>
+      
+      {/* 🔥 HEADER */}
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <h1 style={{
+          color: "gold",
+          textShadow: "0 0 20px gold"
+        }}>
+          🏆 Ranking
+        </h1>
 
+        <button
+          onClick={() => window.location.href = "/profile"}
+          style={{
+            padding: "10px 15px",
+            background: "gold",
+            border: "none",
+            cursor: "pointer",
+            borderRadius: 6
+          }}
+        >
+          👤 Mi perfil
+        </button>
+      </div>
+
+      {/* 🔥 LISTA */}
       {players.map((p, i) => {
         const progress = (p.haki % 10) * 10;
 
