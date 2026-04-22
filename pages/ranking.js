@@ -6,6 +6,14 @@ export default function Ranking() {
 
   const getLevel = (haki) => Math.floor(haki / 10) + 1;
 
+  const getLeague = (haki) => {
+    if (haki < 10) return "🟤";
+    if (haki < 30) return "⚪";
+    if (haki < 60) return "🟡";
+    if (haki < 100) return "💎";
+    return "👑";
+  };
+
   const fetchPlayers = async () => {
     const { data, error } = await supabase
       .from("players")
@@ -19,39 +27,64 @@ export default function Ranking() {
 
   useEffect(() => {
     fetchPlayers();
+    const interval = setInterval(fetchPlayers, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        padding: 20,
-        background: "black",
-        color: "white",
-      }}
-    >
-      <h1 style={{ color: "gold" }}>🏆 Ranking</h1>
+    <div style={{
+      minHeight: "100vh",
+      padding: 20,
+      background: "radial-gradient(circle at top, #1a1a1a, #000)",
+      color: "white"
+    }}>
+      
+      <h1 style={{
+        color: "gold",
+        textShadow: "0 0 20px gold"
+      }}>
+        🏆 Ranking
+      </h1>
 
-      {/* 🔥 BOTÓN PERFIL */}
+      {/* BOTÓN PERFIL PROPIO */}
       <button
         onClick={() => window.location.href = "/profile"}
         style={{
-          display: "block",
           marginBottom: 20,
-          padding: "15px",
-          fontSize: 18,
+          padding: "12px 20px",
+          fontSize: 16,
           background: "gold",
           border: "none",
-          borderRadius: 10,
-          cursor: "pointer",
+          borderRadius: 8,
+          cursor: "pointer"
         }}
       >
-        👤 IR A MI PERFIL
+        👤 Mi perfil
       </button>
 
+      {/* LISTA JUGADORES */}
       {players.map((p, i) => (
-        <div key={p.id} style={{ marginBottom: 10 }}>
-          {i + 1}. {p.name} — HAKI: {p.haki} — LVL: {getLevel(p.haki)}
+        <div key={p.id} style={{
+          marginBottom: 15,
+          padding: 10,
+          border: "1px solid #333",
+          borderRadius: 8,
+          color: i === 0 ? "gold" : "white"
+        }}>
+          {i + 1}.{" "}
+          
+          {/* 🔥 CLICK EN NOMBRE */}
+          <span
+            onClick={() => window.location.href = `/player/${p.id}`}
+            style={{
+              cursor: "pointer",
+              textDecoration: "underline"
+            }}
+          >
+            {p.name}
+          </span>
+
+          {" "} {getLeague(p.haki)} — HAKI: {p.haki} — LVL: {getLevel(p.haki)}
         </div>
       ))}
     </div>
