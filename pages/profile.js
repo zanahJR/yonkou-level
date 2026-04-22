@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { useRouter } from "next/router";
 
 export default function Profile() {
   const [player, setPlayer] = useState(null);
   const [matches, setMatches] = useState([]);
+  const router = useRouter();
 
   const getLevel = (haki) => Math.floor(haki / 10) + 1;
 
@@ -18,16 +20,19 @@ export default function Profile() {
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("player"));
 
-    if (!stored) {
+    // 🔥 si hay id en URL → ver ese perfil
+    if (router.query.id) {
+      fetchPlayer(router.query.id);
+    } 
+    // 🔥 si no → tu perfil
+    else if (stored) {
+      fetchPlayer(stored.id);
+    } else {
       window.location.href = "/login";
-      return;
     }
-
-    fetchPlayer(stored.id);
-  }, []);
+  }, [router.query.id]);
 
   const fetchPlayer = async (id) => {
-    // 🔥 traer jugador
     const { data: playerData } = await supabase
       .from("players")
       .select("*")
@@ -36,7 +41,6 @@ export default function Profile() {
 
     setPlayer(playerData);
 
-    // 🔥 traer partidas
     const { data: matchData } = await supabase
       .from("matches")
       .select("*")
@@ -44,7 +48,6 @@ export default function Profile() {
       .order("created_at", { ascending: false })
       .limit(10);
 
-    // 🔥 traer nombres de rivales (CLAVE)
     const matchesWithNames = await Promise.all(
       (matchData || []).map(async (m) => {
         if (!m.opponent_id) {
@@ -96,7 +99,6 @@ export default function Profile() {
       <p>❌ Loses: {player.loses}</p>
       <p>📊 Winrate: {winrate}%</p>
 
-      {/* 🔥 HISTORIAL REAL */}
       <h3 style={{ marginTop: 20 }}>📜 Historial</h3>
 
       {matches.map((m, i) => (
