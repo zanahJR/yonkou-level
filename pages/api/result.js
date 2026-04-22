@@ -13,20 +13,27 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Faltan datos" });
     }
 
+    // 🔥 GUARDAR PARTIDA (IMPORTANTE LOG)
+    const { error: matchError } = await supabase
+      .from("matches")
+      .insert([
+        {
+          player_id: playerId,
+          opponent_id: opponentId || null,
+          result: result,
+        },
+      ]);
+
+    if (matchError) {
+      console.log("❌ error guardando match:", matchError);
+    }
+
+    // 🔍 obtener jugador
     const { data } = await supabase
       .from("players")
       .select("haki, wins, loses")
       .eq("id", playerId)
       .single();
-
-    // 🔥 guardar partida con rival
-    await supabase.from("matches").insert([
-      {
-        player_id: playerId,
-        opponent_id: opponentId || null,
-        result: result
-      }
-    ]);
 
     const newHaki = data.haki + (result === "win" ? 2 : 0);
     const newWins = data.wins + (result === "win" ? 1 : 0);
@@ -43,6 +50,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ success: true });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ error: "Error servidor" });
   }
 }
