@@ -27,6 +27,7 @@ export default function Profile() {
   }, []);
 
   const fetchPlayer = async (id) => {
+    // jugador
     const { data } = await supabase
       .from("players")
       .select("*")
@@ -35,10 +36,14 @@ export default function Profile() {
 
     setPlayer(data);
 
-    // 🔥 HISTORIAL
+    // 🔥 historial con JOIN (nombre rival)
     const { data: matchData } = await supabase
       .from("matches")
-      .select("*")
+      .select(`
+        id,
+        result,
+        opponent:players!matches_opponent_id_fkey ( id, name )
+      `)
       .eq("player_id", id)
       .order("created_at", { ascending: false })
       .limit(10);
@@ -75,14 +80,16 @@ export default function Profile() {
       <p>❌ Loses: {player.loses}</p>
       <p>📊 Winrate: {winrate}%</p>
 
-      {/* 🔥 HISTORIAL */}
+      {/* 🔥 HISTORIAL CON NOMBRES */}
       <h3 style={{ marginTop: 20 }}>📜 Historial</h3>
 
       {matches.map((m, i) => (
         <div key={i} style={{
-          color: m.result === "win" ? "lime" : "red"
+          color: m.result === "win" ? "lime" : "red",
+          marginBottom: 5
         }}>
-          {m.result === "win" ? "🏆 Victoria" : "💀 Derrota"}
+          {m.result === "win" ? "🏆 Victoria" : "💀 Derrota"} 
+          {m.opponent?.name ? ` vs ${m.opponent.name}` : ""}
         </div>
       ))}
 
