@@ -20,12 +20,9 @@ export default function Profile() {
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("player"));
 
-    // 🔥 si hay id en URL → ver ese perfil
     if (router.query.id) {
       fetchPlayer(router.query.id);
-    } 
-    // 🔥 si no → tu perfil
-    else if (stored) {
+    } else if (stored) {
       fetchPlayer(stored.id);
     } else {
       window.location.href = "/login";
@@ -33,6 +30,7 @@ export default function Profile() {
   }, [router.query.id]);
 
   const fetchPlayer = async (id) => {
+    // 🔥 PLAYER
     const { data: playerData } = await supabase
       .from("players")
       .select("*")
@@ -41,6 +39,7 @@ export default function Profile() {
 
     setPlayer(playerData);
 
+    // 🔥 MATCHES
     const { data: matchData } = await supabase
       .from("matches")
       .select("*")
@@ -48,10 +47,11 @@ export default function Profile() {
       .order("created_at", { ascending: false })
       .limit(10);
 
+    // 🔥 AÑADIR NOMBRE DEL RIVAL (CLAVE)
     const matchesWithNames = await Promise.all(
       (matchData || []).map(async (m) => {
         if (!m.opponent_id) {
-          return { ...m, opponent_name: "Desconocido" };
+          return { ...m, opponent_name: "???" };
         }
 
         const { data: opponent } = await supabase
