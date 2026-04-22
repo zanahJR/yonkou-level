@@ -31,28 +31,28 @@ export default function Ranking() {
       color: "white"
     }}>
       
-      {/* 🔥 HEADER */}
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h1 style={{
-          color: "gold",
-          textShadow: "0 0 20px gold"
-        }}>
-          🏆 Ranking
-        </h1>
+      <h1 style={{
+        color: "gold",
+        textShadow: "0 0 20px gold"
+      }}>
+        🏆 Ranking
+      </h1>
 
-        <button
-          onClick={() => window.location.href = "/profile"}
-          style={{
-            padding: "10px 15px",
-            background: "gold",
-            border: "none",
-            cursor: "pointer",
-            borderRadius: 6
-          }}
-        >
-          👤 Mi perfil
-        </button>
-      </div>
+      {/* 🔥 BOTÓN PERFIL (VISIBLE SÍ O SÍ) */}
+      <button
+        onClick={() => window.location.href = "/profile"}
+        style={{
+          marginBottom: 20,
+          padding: "12px 20px",
+          fontSize: 16,
+          background: "gold",
+          border: "none",
+          borderRadius: 8,
+          cursor: "pointer"
+        }}
+      >
+        👤 Ver mi perfil
+      </button>
 
       {/* 🔥 LISTA */}
       {players.map((p, i) => {
@@ -68,7 +68,7 @@ export default function Ranking() {
           }}>
             {i + 1}. {p.name} — HAKI: {p.haki} — LVL: {getLevel(p.haki)}
 
-            {/* 🔥 barra progreso */}
+            {/* barra progreso */}
             <div style={{
               width: "100%",
               height: 6,
