@@ -7,12 +7,16 @@ export default function Ranking() {
   const getLevel = (haki) => Math.floor(haki / 10) + 1;
 
   const getLeague = (haki) => {
-    if (haki < 10) return "🟤";
-    if (haki < 30) return "⚪";
-    if (haki < 60) return "🟡";
-    if (haki < 100) return "💎";
-    return "👑";
+    if (haki < 10) return "Bronce 🟤";
+    if (haki < 30) return "Plata ⚪";
+    if (haki < 60) return "Oro 🟡";
+    if (haki < 100) return "Diamante 💎";
+    return "Yonkou 👑🔥";
   };
+
+  useEffect(() => {
+    fetchPlayers();
+  }, []);
 
   const fetchPlayers = async () => {
     const { data, error } = await supabase
@@ -20,73 +24,84 @@ export default function Ranking() {
       .select("*")
       .order("haki", { ascending: false });
 
-    if (error) console.log(error);
+    if (error) {
+      console.log(error);
+      return;
+    }
 
-    setPlayers(data || []);
+    setPlayers(data);
+
+    // 🔥 CLAVE PARA ADMIN PANEL
+    localStorage.setItem("players_list", JSON.stringify(data));
   };
-
-  useEffect(() => {
-    fetchPlayers();
-    const interval = setInterval(fetchPlayers, 3000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div style={{
       minHeight: "100vh",
-      padding: 20,
-      background: "radial-gradient(circle at top, #1a1a1a, #000)",
-      color: "white"
+      background: "black",
+      color: "white",
+      padding: 20
     }}>
-      
-      <h1 style={{
-        color: "gold",
-        textShadow: "0 0 20px gold"
-      }}>
-        🏆 Ranking
-      </h1>
+      <h1 style={{ color: "gold" }}>🏆 Ranking</h1>
 
-      {/* BOTÓN PERFIL PROPIO */}
       <button
         onClick={() => window.location.href = "/profile"}
         style={{
           marginBottom: 20,
-          padding: "12px 20px",
-          fontSize: 16,
+          padding: "10px 15px",
           background: "gold",
           border: "none",
-          borderRadius: 8,
+          borderRadius: 6,
           cursor: "pointer"
         }}
       >
         👤 Mi perfil
       </button>
 
-      {/* LISTA JUGADORES */}
-      {players.map((p, i) => (
-        <div key={p.id} style={{
-          marginBottom: 15,
-          padding: 10,
-          border: "1px solid #333",
-          borderRadius: 8,
-          color: i === 0 ? "gold" : "white"
-        }}>
-          {i + 1}.{" "}
-          
-          {/* 🔥 CLICK EN NOMBRE */}
-          <span
-            onClick={() => window.location.href = `/player/${p.id}`}
+      {players.map((p, i) => {
+        const progress = (p.haki % 10) * 10;
+
+        return (
+          <div
+            key={p.id}
             style={{
-              cursor: "pointer",
-              textDecoration: "underline"
+              padding: 10,
+              borderBottom: "1px solid #333"
             }}
           >
-            {p.name}
-          </span>
+            <div>
+              {i + 1}.{" "}
+              <span
+                onClick={() => window.location.href = `/player/${p.id}`}
+                style={{
+                  cursor: "pointer",
+                  textDecoration: "underline"
+                }}
+              >
+                {p.name}
+              </span>
+            </div>
 
-          {" "} {getLeague(p.haki)} — HAKI: {p.haki} — LVL: {getLevel(p.haki)}
-        </div>
-      ))}
+            <div>{getLeague(p.haki)}</div>
+            <div>🔥 HAKI: {p.haki}</div>
+            <div>🏆 Nivel: {getLevel(p.haki)}</div>
+
+            {/* 🔥 barra progreso */}
+            <div style={{
+              width: "100%",
+              height: 6,
+              background: "#333",
+              marginTop: 4
+            }}>
+              <div style={{
+                width: `${progress}%`,
+                height: "100%",
+                background: "gold"
+              }} />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
