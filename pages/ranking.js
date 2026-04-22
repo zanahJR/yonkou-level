@@ -4,9 +4,8 @@ import { supabase } from "../lib/supabase";
 export default function Ranking() {
   const [players, setPlayers] = useState([]);
 
-  useEffect(() => {
-    fetchPlayers();
-  }, []);
+  // 🔥 calcular nivel
+  const getLevel = (haki) => Math.floor(haki / 10) + 1;
 
   const fetchPlayers = async () => {
     const { data, error } = await supabase
@@ -19,15 +18,58 @@ export default function Ranking() {
     setPlayers(data || []);
   };
 
-  return (
-    <div style={{ padding: 20, color: "white", background: "black", minHeight: "100vh" }}>
-      <h1>🏆 Ranking</h1>
+  useEffect(() => {
+    fetchPlayers();
 
-      {players.map((p, i) => (
-        <div key={p.id}>
-          {i + 1}. {p.name} — HAKI: {p.haki}
-        </div>
-      ))}
+    // 🔄 auto refresh cada 3s
+    const interval = setInterval(fetchPlayers, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      padding: 20,
+      background: "radial-gradient(circle at top, #1a1a1a, #000)",
+      color: "white"
+    }}>
+      <h1 style={{
+        color: "gold",
+        textShadow: "0 0 20px gold"
+      }}>
+        🏆 Ranking
+      </h1>
+
+      {players.map((p, i) => {
+        const progress = (p.haki % 10) * 10;
+
+        return (
+          <div key={p.id} style={{
+            marginBottom: 15,
+            padding: 10,
+            border: "1px solid #333",
+            borderRadius: 8,
+            color: i === 0 ? "gold" : "white"
+          }}>
+            {i + 1}. {p.name} — HAKI: {p.haki} — LVL: {getLevel(p.haki)}
+
+            {/* 🔥 barra progreso */}
+            <div style={{
+              width: "100%",
+              height: 6,
+              background: "#333",
+              marginTop: 6
+            }}>
+              <div style={{
+                width: `${progress}%`,
+                height: "100%",
+                background: "gold"
+              }} />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
