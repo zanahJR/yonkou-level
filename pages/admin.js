@@ -1,49 +1,59 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
 export default function Admin() {
-  const [p1, setP1] = useState("");
-  const [p2, setP2] = useState("");
-  const [winner, setWinner] = useState("");
+  const [players, setPlayers] = useState([]);
+  const [p1, setP1] = useState(null);
+  const [p2, setP2] = useState(null);
 
-  const sendResult = async () => {
-    if (!p1 || !p2 || !winner) {
-      alert("Completa todos los campos");
+  useEffect(() => {
+    fetchPlayers();
+  }, []);
+
+  const fetchPlayers = async () => {
+    const { data } = await supabase
+      .from("players")
+      .select("*")
+      .order("haki", { ascending: false });
+
+    setPlayers(data || []);
+  };
+
+  const playMatch = async (winnerId) => {
+    if (!p1 || !p2) {
+      alert("Selecciona 2 jugadores");
       return;
     }
 
-    // 🔥 buscar jugador 1
-    const { data: player1 } = await supabase
-      .from("players")
-      .select("*")
-      .eq("name", p1)
-      .single();
+    const loserId = winnerId === p1.id ? p2.id : p1.id;
 
-    // 🔥 buscar jugador 2
-    const { data: player2 } = await supabase
-      .from("players")
-      .select("*")
-      .eq("name", p2)
-      .single();
-
-    if (!player1 || !player2) {
-      alert("Jugadores no encontrados en BD");
-      return;
-    }
-
-    const result = winner === p1 ? "win" : "lose";
-
+    // ganador
     await fetch("/api/result", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        playerId: player1.id,
-        opponentId: player2.id,
-        result
+        playerId: winnerId,
+        opponentId: loserId,
+        result: "win"
       }),
     });
 
-    alert("✅ Resultado enviado correctamente");
+    // perdedor
+    await fetch("/api/result", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        playerId: loserId,
+        opponentId: winnerId,
+        result: "lose"
+      }),
+    });
+
+    alert("🔥 Partida guardada");
+
+    setP1(null);
+    setP2(null);
+    fetchPlayers();
   };
 
   return (
@@ -53,32 +63,39 @@ export default function Admin() {
       color: "white",
       padding: 20
     }}>
-      <h2 style={{ color: "gold" }}>🏪 Panel Tienda</h2>
+      <h1 style={{ color: "gold" }}>🏪 TORNEO TIENDA</h1>
 
-      <input
-        placeholder="Jugador 1"
-        value={p1}
-        onChange={(e) => setP1(e.target.value)}
-      />
-      <br /><br />
+      <h3>Selecciona jugadores</h3>
 
-      <input
-        placeholder="Jugador 2"
-        value={p2}
-        onChange={(e) => setP2(e.target.value)}
-      />
-      <br /><br />
+      {players.map((p) => (
+        <div key={p.id} style={{ marginBottom: 10 }}>
+          <button onClick={() => setP1(p)}>
+            🅰️ {p.name}
+          </button>
 
-      <input
-        placeholder="Ganador"
-        value={winner}
-        onChange={(e) => setWinner(e.target.value)}
-      />
-      <br /><br />
+          <button onClick={() => setP2(p)} style={{ marginLeft: 10 }}>
+            🅱️ {p.name}
+          </button>
+        </div>
+      ))}
 
-      <button onClick={sendResult}>
-        Enviar resultado
-      </button>
+      <hr />
+
+      <h3>Combate</h3>
+
+      {p1 && p2 && (
+        <div>
+          <h2>{p1.name} 🆚 {p2.name}</h2>
+
+          <button onClick={() => playMatch(p1.id)}>
+            🏆 Gana {p1.name}
+          </button>
+
+          <button onClick={() => playMatch(p2.id)} style={{ marginLeft: 10 }}>
+            🏆 Gana {p2.name}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
