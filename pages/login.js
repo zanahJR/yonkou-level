@@ -3,38 +3,54 @@ import { supabase } from "../lib/supabase";
 
 export default function Login() {
   const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    if (!name) return alert("Escribe un nombre");
+    if (!name || !password) {
+      alert("Completa todo");
+      return;
+    }
 
-    // 🔍 buscar jugador
-    const { data: existing, error } = await supabase
+    // 🔍 buscar usuario
+    const { data, error } = await supabase
       .from("players")
       .select("*")
       .eq("name", name)
-      .maybeSingle();
+      .single();
 
-    let player = existing;
-
-    // 🆕 si no existe → crear
-    if (!player) {
-      const { data: newPlayer, error: insertError } = await supabase
-        .from("players")
-        .insert([{ name, haki: 0 }])
-        .select()
-        .single();
-
-      if (insertError) {
-        alert(insertError.message);
+    if (data) {
+      // 👉 existe → comprobar password
+      if (data.password !== password) {
+        alert("Password incorrecta");
         return;
       }
 
-      player = newPlayer;
+      localStorage.setItem("player", JSON.stringify(data));
+      window.location.href = "/ranking";
+      return;
     }
 
-    // 💾 guardar sesión
-    localStorage.setItem("player", JSON.stringify(player));
+    // 👉 no existe → crear usuario
+    const { data: newUser, error: insertError } = await supabase
+      .from("players")
+      .insert([
+        {
+          name,
+          password,
+          haki: 0,
+          wins: 0,
+          loses: 0
+        },
+      ])
+      .select()
+      .single();
 
+    if (insertError) {
+      alert(insertError.message);
+      return;
+    }
+
+    localStorage.setItem("player", JSON.stringify(newUser));
     window.location.href = "/ranking";
   };
 
@@ -47,14 +63,25 @@ export default function Login() {
       background: "black",
       color: "white"
     }}>
-      <div>
-        <h2>Login 🏴‍☠️</h2>
+      <div style={{ padding: 30, border: "1px solid gold" }}>
+        <h2>Login</h2>
 
         <input
           placeholder="Nombre"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
+
+        <br /><br />
+
+        <input
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <br /><br />
 
         <button onClick={handleLogin}>
           Entrar
