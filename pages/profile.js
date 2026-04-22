@@ -36,19 +36,33 @@ export default function Profile() {
 
     setPlayer(data);
 
-    // 🔥 historial con JOIN (nombre rival)
+    // 🔥 obtener matches SIN join
     const { data: matchData } = await supabase
       .from("matches")
-      .select(`
-        id,
-        result,
-        opponent:players!matches_opponent_id_fkey ( id, name )
-      `)
+      .select("*")
       .eq("player_id", id)
       .order("created_at", { ascending: false })
       .limit(10);
 
-    setMatches(matchData || []);
+    // 🔥 traer nombres manualmente
+    const matchesWithNames = await Promise.all(
+      (matchData || []).map(async (m) => {
+        if (!m.opponent_id) return { ...m, opponent_name: "Desconocido" };
+
+        const { data: opponent } = await supabase
+          .from("players")
+          .select("name")
+          .eq("id", m.opponent_id)
+          .single();
+
+        return {
+          ...m,
+          opponent_name: opponent?.name || "???",
+        };
+      })
+    );
+
+    setMatches(matchesWithNames);
   };
 
   if (!player) return <div style={{ color: "white" }}>Cargando...</div>;
@@ -80,7 +94,7 @@ export default function Profile() {
       <p>❌ Loses: {player.loses}</p>
       <p>📊 Winrate: {winrate}%</p>
 
-      {/* 🔥 HISTORIAL CON NOMBRES */}
+      {/* 🔥 HISTORIAL REAL */}
       <h3 style={{ marginTop: 20 }}>📜 Historial</h3>
 
       {matches.map((m, i) => (
@@ -89,7 +103,7 @@ export default function Profile() {
           marginBottom: 5
         }}>
           {m.result === "win" ? "🏆 Victoria" : "💀 Derrota"} 
-          {m.opponent?.name ? ` vs ${m.opponent.name}` : ""}
+          {" vs "} {m.opponent_name}
         </div>
       ))}
 
