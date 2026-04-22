@@ -27,16 +27,16 @@ export default function Profile() {
   }, []);
 
   const fetchPlayer = async (id) => {
-    // jugador
-    const { data } = await supabase
+    // 🔥 traer jugador
+    const { data: playerData } = await supabase
       .from("players")
       .select("*")
       .eq("id", id)
       .single();
 
-    setPlayer(data);
+    setPlayer(playerData);
 
-    // 🔥 obtener matches SIN join
+    // 🔥 traer partidas
     const { data: matchData } = await supabase
       .from("matches")
       .select("*")
@@ -44,10 +44,12 @@ export default function Profile() {
       .order("created_at", { ascending: false })
       .limit(10);
 
-    // 🔥 traer nombres manualmente
+    // 🔥 traer nombres de rivales (CLAVE)
     const matchesWithNames = await Promise.all(
       (matchData || []).map(async (m) => {
-        if (!m.opponent_id) return { ...m, opponent_name: "Desconocido" };
+        if (!m.opponent_id) {
+          return { ...m, opponent_name: "Desconocido" };
+        }
 
         const { data: opponent } = await supabase
           .from("players")
@@ -98,10 +100,13 @@ export default function Profile() {
       <h3 style={{ marginTop: 20 }}>📜 Historial</h3>
 
       {matches.map((m, i) => (
-        <div key={i} style={{
-          color: m.result === "win" ? "lime" : "red",
-          marginBottom: 5
-        }}>
+        <div
+          key={i}
+          style={{
+            color: m.result === "win" ? "lime" : "red",
+            marginBottom: 5
+          }}
+        >
           {m.result === "win" ? "🏆 Victoria" : "💀 Derrota"} 
           {" vs "} {m.opponent_name}
         </div>
