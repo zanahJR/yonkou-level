@@ -7,38 +7,32 @@ const supabase = createClient(
 
 export default async function handler(req, res) {
   try {
-    const { playerId, result } = req.body;
+    const { playerId, opponentId, result } = req.body;
 
     if (!playerId || !result) {
       return res.status(400).json({ error: "Faltan datos" });
     }
 
-    // 🔍 obtener datos actuales
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("players")
       .select("haki, wins, loses")
       .eq("id", playerId)
       .single();
 
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-
-    // 🔥 GUARDAR PARTIDA
+    // 🔥 guardar partida con rival
     await supabase.from("matches").insert([
       {
         player_id: playerId,
+        opponent_id: opponentId || null,
         result: result
       }
     ]);
 
-    // 🧠 calcular nuevos valores
     const newHaki = data.haki + (result === "win" ? 2 : 0);
     const newWins = data.wins + (result === "win" ? 1 : 0);
     const newLoses = data.loses + (result === "lose" ? 1 : 0);
 
-    // ➕ actualizar jugador
-    const { error: updateError } = await supabase
+    await supabase
       .from("players")
       .update({
         haki: newHaki,
@@ -46,10 +40,6 @@ export default async function handler(req, res) {
         loses: newLoses,
       })
       .eq("id", playerId);
-
-    if (updateError) {
-      return res.status(500).json({ error: updateError.message });
-    }
 
     return res.status(200).json({ success: true });
   } catch (err) {
