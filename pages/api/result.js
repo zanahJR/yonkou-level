@@ -9,7 +9,6 @@ export default async function handler(req, res) {
   try {
     const { playerId, result } = req.body;
 
-    // 🔒 validación
     if (!playerId || !result) {
       return res.status(400).json({ error: "Faltan datos" });
     }
@@ -25,12 +24,20 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: error.message });
     }
 
+    // 🔥 GUARDAR PARTIDA
+    await supabase.from("matches").insert([
+      {
+        player_id: playerId,
+        result: result
+      }
+    ]);
+
     // 🧠 calcular nuevos valores
     const newHaki = data.haki + (result === "win" ? 2 : 0);
     const newWins = data.wins + (result === "win" ? 1 : 0);
     const newLoses = data.loses + (result === "lose" ? 1 : 0);
 
-    // ➕ actualizar
+    // ➕ actualizar jugador
     const { error: updateError } = await supabase
       .from("players")
       .update({
