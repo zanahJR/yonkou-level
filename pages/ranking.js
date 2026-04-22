@@ -14,28 +14,18 @@ export default function Ranking() {
       .select("*")
       .order("haki", { ascending: false });
 
-    if (error) {
-      console.log(error);
-    }
+    if (error) console.log(error);
 
     setPlayers(data || []);
   };
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#000",
-      color: "white",
-      padding: 20
-    }}>
+    <div style={{ padding: 20, color: "white", background: "black", minHeight: "100vh" }}>
       <h1>🏆 Ranking</h1>
 
       {players.map((p, i) => (
-        <div key={i} style={{
-          padding: 10,
-          borderBottom: "1px solid #333"
-        }}>
-          {i + 1}. {p.name} — HAKI: {p.xp}
+        <div key={p.id}>
+          {i + 1}. {p.name} — HAKI: {p.haki}
         </div>
       ))}
     </div>
