@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { supabase } from "../lib/supabase";
 
 export default function Admin() {
   const [p1, setP1] = useState("");
@@ -6,13 +7,27 @@ export default function Admin() {
   const [winner, setWinner] = useState("");
 
   const sendResult = async () => {
-    const players = JSON.parse(localStorage.getItem("players_list") || "[]");
+    if (!p1 || !p2 || !winner) {
+      alert("Completa todos los campos");
+      return;
+    }
 
-    const player1 = players.find(p => p.name === p1);
-    const player2 = players.find(p => p.name === p2);
+    // 🔥 buscar jugador 1
+    const { data: player1 } = await supabase
+      .from("players")
+      .select("*")
+      .eq("name", p1)
+      .single();
+
+    // 🔥 buscar jugador 2
+    const { data: player2 } = await supabase
+      .from("players")
+      .select("*")
+      .eq("name", p2)
+      .single();
 
     if (!player1 || !player2) {
-      alert("Jugadores no encontrados");
+      alert("Jugadores no encontrados en BD");
       return;
     }
 
@@ -28,20 +43,37 @@ export default function Admin() {
       }),
     });
 
-    alert("Resultado enviado");
+    alert("✅ Resultado enviado correctamente");
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Panel tienda</h2>
+    <div style={{
+      minHeight: "100vh",
+      background: "black",
+      color: "white",
+      padding: 20
+    }}>
+      <h2 style={{ color: "gold" }}>🏪 Panel Tienda</h2>
 
-      <input placeholder="Jugador 1" onChange={e => setP1(e.target.value)} />
+      <input
+        placeholder="Jugador 1"
+        value={p1}
+        onChange={(e) => setP1(e.target.value)}
+      />
       <br /><br />
 
-      <input placeholder="Jugador 2" onChange={e => setP2(e.target.value)} />
+      <input
+        placeholder="Jugador 2"
+        value={p2}
+        onChange={(e) => setP2(e.target.value)}
+      />
       <br /><br />
 
-      <input placeholder="Ganador" onChange={e => setWinner(e.target.value)} />
+      <input
+        placeholder="Ganador"
+        value={winner}
+        onChange={(e) => setWinner(e.target.value)}
+      />
       <br /><br />
 
       <button onClick={sendResult}>
