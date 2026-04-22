@@ -12,7 +12,7 @@ export default function Login() {
 
     const { error } = await supabase
       .from("players")
-      .insert([{ name, xp: 0 }]);
+      .insert([{ name, haki: 0 }]);
 
     if (error) {
       alert("Error: " + error.message);
