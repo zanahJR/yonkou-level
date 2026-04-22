@@ -3,11 +3,10 @@ import { supabase } from "../lib/supabase";
 
 export default function Profile() {
   const [player, setPlayer] = useState(null);
+  const [matches, setMatches] = useState([]);
 
-  // 🔥 nivel
   const getLevel = (haki) => Math.floor(haki / 10) + 1;
 
-  // 🔥 ligas
   const getLeague = (haki) => {
     if (haki < 10) return "Bronce 🟤";
     if (haki < 30) return "Plata ⚪";
@@ -28,23 +27,26 @@ export default function Profile() {
   }, []);
 
   const fetchPlayer = async (id) => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("players")
       .select("*")
       .eq("id", id)
       .single();
 
-    if (error) {
-      console.log(error);
-      return;
-    }
-
     setPlayer(data);
+
+    // 🔥 HISTORIAL
+    const { data: matchData } = await supabase
+      .from("matches")
+      .select("*")
+      .eq("player_id", id)
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    setMatches(matchData || []);
   };
 
-  if (!player) {
-    return <div style={{ color: "white" }}>Cargando...</div>;
-  }
+  if (!player) return <div style={{ color: "white" }}>Cargando...</div>;
 
   const winrate =
     player.wins + player.loses === 0
@@ -59,25 +61,30 @@ export default function Profile() {
       padding: 20,
       textAlign: "center"
     }}>
-      <h1 style={{ color: "gold", textShadow: "0 0 20px gold" }}>
-        👤 PERFIL
-      </h1>
+      <h1 style={{ color: "gold" }}>👤 PERFIL</h1>
 
       <h2>{player.name}</h2>
-
-      {/* 🔥 LIGA */}
-      <h3 style={{ marginBottom: 10 }}>
-        {getLeague(player.haki)}
-      </h3>
+      <h3>{getLeague(player.haki)}</h3>
 
       <p>🔥 HAKI: {player.haki}</p>
       <p>🏆 Nivel: {getLevel(player.haki)}</p>
 
-      <hr style={{ margin: "20px 0" }} />
+      <hr />
 
       <p>✅ Wins: {player.wins}</p>
       <p>❌ Loses: {player.loses}</p>
       <p>📊 Winrate: {winrate}%</p>
+
+      {/* 🔥 HISTORIAL */}
+      <h3 style={{ marginTop: 20 }}>📜 Historial</h3>
+
+      {matches.map((m, i) => (
+        <div key={i} style={{
+          color: m.result === "win" ? "lime" : "red"
+        }}>
+          {m.result === "win" ? "🏆 Victoria" : "💀 Derrota"}
+        </div>
+      ))}
 
       <button
         onClick={() => window.location.href = "/ranking"}
@@ -90,7 +97,7 @@ export default function Profile() {
           cursor: "pointer"
         }}
       >
-        ⬅ Volver al ranking
+        ⬅ Volver
       </button>
     </div>
   );
