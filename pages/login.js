@@ -7,14 +7,33 @@ export default function Login() {
   const handleLogin = async () => {
     if (!name) return alert("Escribe un nombre");
 
-    const { error } = await supabase
+    // 🔍 buscar jugador
+    const { data: existing, error } = await supabase
       .from("players")
-      .insert([{ name, haki: 0 }]);
+      .select("*")
+      .eq("name", name)
+      .maybeSingle();
 
-    if (error) {
-      alert(error.message);
-      return;
+    let player = existing;
+
+    // 🆕 si no existe → crear
+    if (!player) {
+      const { data: newPlayer, error: insertError } = await supabase
+        .from("players")
+        .insert([{ name, haki: 0 }])
+        .select()
+        .single();
+
+      if (insertError) {
+        alert(insertError.message);
+        return;
+      }
+
+      player = newPlayer;
     }
+
+    // 💾 guardar sesión
+    localStorage.setItem("player", JSON.stringify(player));
 
     window.location.href = "/ranking";
   };
