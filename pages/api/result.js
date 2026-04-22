@@ -9,18 +9,15 @@ export default async function handler(req, res) {
   try {
     const { playerId, result } = req.body;
 
-    // ⚠️ validación básica
+    // 🔒 validación
     if (!playerId || !result) {
       return res.status(400).json({ error: "Faltan datos" });
     }
 
-    // 🧠 puntos según resultado
-    const points = result === "win" ? 2 : 0;
-
-    // 🔍 obtener haki actual
+    // 🔍 obtener datos actuales
     const { data, error } = await supabase
       .from("players")
-      .select("haki")
+      .select("haki, wins, loses")
       .eq("id", playerId)
       .single();
 
@@ -28,10 +25,19 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: error.message });
     }
 
-    // ➕ actualizar haki
+    // 🧠 calcular nuevos valores
+    const newHaki = data.haki + (result === "win" ? 2 : 0);
+    const newWins = data.wins + (result === "win" ? 1 : 0);
+    const newLoses = data.loses + (result === "lose" ? 1 : 0);
+
+    // ➕ actualizar
     const { error: updateError } = await supabase
       .from("players")
-      .update({ haki: data.haki + points })
+      .update({
+        haki: newHaki,
+        wins: newWins,
+        loses: newLoses,
+      })
       .eq("id", playerId);
 
     if (updateError) {
